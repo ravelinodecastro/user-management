@@ -53,4 +53,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(response);
     }
 
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailExists(
+            EmailAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                409,
+                "Conflict",
+                Instant.now(),
+                request.getRequestURI(),
+                List.of(new FieldErrorResponse("email", ex.getMessage()))
+        );
+
+        return ResponseEntity.status(409).body(response);
+    }
+
 }

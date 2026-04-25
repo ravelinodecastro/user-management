@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pt.uevora.user_management.dto.UserRequestDTO;
 import pt.uevora.user_management.dto.UserResponseDTO;
 import pt.uevora.user_management.entities.User;
+import pt.uevora.user_management.exeptions.EmailAlreadyExistsException;
 import pt.uevora.user_management.exeptions.UserNotFoundException;
 import pt.uevora.user_management.mappers.UserMapper;
 import pt.uevora.user_management.repositories.UserRepository;
@@ -18,6 +19,9 @@ public class UserService {
     private UserRepository repository;
 
     public UserResponseDTO create(UserRequestDTO dto) {
+        if (repository.existsByEmail(dto.getEmail())) {
+            throw new EmailAlreadyExistsException(dto.getEmail());
+        }
         User user = UserMapper.toEntity(dto);
         return UserMapper.toDTO(repository.save(user));
     }
@@ -39,6 +43,10 @@ public class UserService {
         User user = repository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
+        if (!user.getEmail().equals(dto.getEmail()) &&
+                repository.existsByEmail(dto.getEmail())) {
+            throw new EmailAlreadyExistsException(dto.getEmail());
+        }
         user.setEmail(dto.getEmail());
         user.setName(dto.getName());
 
