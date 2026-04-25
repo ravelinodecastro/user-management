@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import pt.uevora.user_management.dto.UserRequestDTO;
 import pt.uevora.user_management.dto.UserResponseDTO;
 import pt.uevora.user_management.entities.User;
+import pt.uevora.user_management.exeptions.UserNotFoundException;
 import pt.uevora.user_management.mappers.UserMapper;
 import pt.uevora.user_management.repositories.UserRepository;
 
@@ -30,13 +31,13 @@ public class UserService {
 
     public UserResponseDTO getOne(Long id) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(id));
         return UserMapper.toDTO(user);
     }
 
     public UserResponseDTO update(Long id, UserRequestDTO dto) {
         User user = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Utilizador não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         user.setEmail(dto.getEmail());
         user.setName(dto.getName());
