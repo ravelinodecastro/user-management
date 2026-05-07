@@ -16,6 +16,8 @@ It provides full CRUD operations for managing users and follows a layered archit
 - Lombok
 - Springdoc OpenAPI (Swagger)
 - Gradle (via gradlew)
+- Docker
+- Docker Compose
 
 ---
 
@@ -44,6 +46,9 @@ pt.uevora.usermanagement
 ├── dto
 ├── mappers
 └── exceptions
+│
+├── Dockerfile
+├── docker-compose.yml
 ```
 
 ---
@@ -159,6 +164,11 @@ jdbc:h2:mem:testdb
 ### Using Gradle Wrapper
 ```bash
 ./gradlew bootRun
+```
+
+### Running with Docker Compose
+```bash
+docker-compose up --build
 ```
 
 ### Build Project
