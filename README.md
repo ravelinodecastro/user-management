@@ -175,3 +175,126 @@ docker-compose up --build
 ```bash
 ./gradlew build
 ```
+
+
+## CI/CD Pipeline (GitHub Actions)
+
+Este projeto utiliza **GitHub Actions** para implementar um pipeline de **CI/CD (Continuous Integration e Continuous Delivery)** que automatiza o build da aplicação e a publicação de uma imagem Docker no Docker Hub.
+
+O pipeline é executado automaticamente sempre que é criado um *tag* no repositório com o formato:
+
+```
+v*.*.*
+```
+
+Exemplo:
+
+```
+v1.0.0
+v1.1.0
+```
+
+---
+
+## Pipeline Overview
+
+O workflow encontra-se definido em:
+
+```
+.github/workflows/docker-publish.yml
+```
+
+### Etapas do pipeline
+
+Sempre que um novo tag é criado, o pipeline executa automaticamente:
+
+1. **Checkout do código**
+
+   * Clona o repositório para o runner do GitHub Actions.
+
+2. **Configuração do Docker Buildx**
+
+   * Permite builds multi-platform e mais eficientes.
+
+3. **Login no Docker Hub**
+
+   * Autenticação usando secrets do GitHub:
+
+     * `DOCKERHUB_USERNAME`
+     * `DOCKERHUB_TOKEN`
+
+4. **Extração da versão**
+
+   * A versão é automaticamente derivada do tag (`v1.0.0 → 1.0.0`).
+
+5. **Build e push da imagem Docker**
+
+   * A imagem é construída e publicada no Docker Hub com duas tags:
+
+     * versão específica (`1.0.0`)
+     * `latest`
+
+---
+
+## Docker Image Repository
+
+A imagem Docker é publicada no Docker Hub:
+
+```
+ravelinodecastro/user-management
+```
+
+Tags publicadas:
+
+* `latest`
+* `X.Y.Z` (baseado no Git tag)
+
+---
+
+## Configuração (Parametrização)
+
+O pipeline foi desenhado para ser facilmente configurável através de **GitHub Secrets**:
+
+### Secrets necessários
+
+| Secret               | Descrição                     |
+| -------------------- | ----------------------------- |
+| `DOCKERHUB_USERNAME` | Username da conta Docker Hub  |
+| `DOCKERHUB_TOKEN`    | Token de acesso do Docker Hub |
+
+---
+
+## Decisões de Implementação
+
+* **Trigger por tags (`v*.*.*`)**
+
+  * Garante versionamento explícito e controlado.
+* **Uso de Docker Hub**
+
+  * Repositório público conforme requisito da avaliação.
+* **Dual tagging (`latest` + version)**
+
+  * Permite tanto deploy estável como rastreabilidade de versões.
+* **Build automatizado no CI**
+
+  * Evita builds manuais e garante consistência entre versões.
+* **Secrets no GitHub**
+
+  * Evita exposição de credenciais no repositório.
+
+---
+
+## Como usar o pipeline
+
+Para publicar uma nova versão:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+O GitHub Actions irá automaticamente:
+
+* compilar o projeto
+* construir a imagem Docker
+* publicar no Docker Hub
